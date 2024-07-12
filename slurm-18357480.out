@@ -1,0 +1,46 @@
+1. SSH tunnel from your workstation using the following command:
+
+   ssh -NL 8888:erc-hpc-comp040:41819 k20108107@hpc.create.kcl.ac.uk
+
+   and point your web browser to http://localhost:8888/lab?token=<add the token from the jupyter output below>
+
+Time started: 2024-07-05 13:45:03.894909
+
+When done using the notebook, terminate the job by
+issuing the following command on the login node:
+
+      scancel -f 18357480
+
+WARNING: overwriting environment variables set in the machine
+overwriting variable MUJOCO_GL PYOPENGL_PLATFORM
+[I 2024-07-05 13:45:07.373 ServerApp] Package jupyterlab took 0.0000s to import
+[I 2024-07-05 13:45:07.459 ServerApp] Package jupyter_lsp took 0.0861s to import
+[W 2024-07-05 13:45:07.459 ServerApp] A `_jupyter_server_extension_points` function was not found in jupyter_lsp. Instead, a `_jupyter_server_extension_paths` function was found and will be used for now. This function name will be deprecated in future releases of Jupyter Server.
+[I 2024-07-05 13:45:07.490 ServerApp] Package jupyter_server_terminals took 0.0301s to import
+[I 2024-07-05 13:45:07.490 ServerApp] Package notebook_shim took 0.0000s to import
+[W 2024-07-05 13:45:07.490 ServerApp] A `_jupyter_server_extension_points` function was not found in notebook_shim. Instead, a `_jupyter_server_extension_paths` function was found and will be used for now. This function name will be deprecated in future releases of Jupyter Server.
+[I 2024-07-05 13:45:07.491 ServerApp] jupyter_lsp | extension was successfully linked.
+[I 2024-07-05 13:45:07.495 ServerApp] jupyter_server_terminals | extension was successfully linked.
+[I 2024-07-05 13:45:07.500 ServerApp] jupyterlab | extension was successfully linked.
+[I 2024-07-05 13:45:08.063 ServerApp] notebook_shim | extension was successfully linked.
+[I 2024-07-05 13:45:08.133 ServerApp] notebook_shim | extension was successfully loaded.
+[I 2024-07-05 13:45:08.135 ServerApp] jupyter_lsp | extension was successfully loaded.
+[I 2024-07-05 13:45:08.139 ServerApp] jupyter_server_terminals | extension was successfully loaded.
+[I 2024-07-05 13:45:08.140 LabApp] JupyterLab extension loaded from /users/k20108107/.conda/envs/diffuser/lib/python3.10/site-packages/jupyterlab
+[I 2024-07-05 13:45:08.140 LabApp] JupyterLab application directory is /users/k20108107/.conda/envs/diffuser/share/jupyter/lab
+[I 2024-07-05 13:45:08.140 LabApp] Extension Manager is 'pypi'.
+[I 2024-07-05 13:45:08.142 ServerApp] jupyterlab | extension was successfully loaded.
+[I 2024-07-05 13:45:08.142 ServerApp] Serving notebooks from local directory: /scratch/users/k20108107/diffuser_cp
+[I 2024-07-05 13:45:08.142 ServerApp] Jupyter Server 2.10.0 is running at:
+[I 2024-07-05 13:45:08.142 ServerApp] http://10.211.4.140:41819/lab?token=fd97899340ca2df0a6f4caebbd46e3a0efab7941b900df9a
+[I 2024-07-05 13:45:08.142 ServerApp]     http://127.0.0.1:41819/lab?token=fd97899340ca2df0a6f4caebbd46e3a0efab7941b900df9a
+[I 2024-07-05 13:45:08.142 ServerApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[C 2024-07-05 13:45:08.147 ServerApp] 
+    
+    To access the server, open this file in a browser:
+        file:///users/k20108107/.local/share/jupyter/runtime/jpserver-174753-open.html
+    Or copy and paste one of these URLs:
+        http://10.211.4.140:41819/lab?token=fd97899340ca2df0a6f4caebbd46e3a0efab7941b900df9a
+        http://127.0.0.1:41819/lab?token=fd97899340ca2df0a6f4caebbd46e3a0efab7941b900df9a
+[I 2024-07-05 13:45:08.211 ServerApp] Skipped non-installed server(s): bash-language-server, dockerfile-language-server-nodejs, javascript-typescript-langserver, jedi-language-server, julia-language-server, pyright, python-language-server, python-lsp-server, r-languageserver, sql-language-server, texlab, typescript-language-server, unified-language-server, vscode-css-languageserver-bin, vscode-html-languageserver-bin, vscode-json-languageserver-bin, yaml-language-server
+slurmstepd: error: *** JOB 18357480 ON erc-hpc-comp040 CANCELLED AT 2024-07-05T15:45:24 DUE TO TIME LIMIT ***
