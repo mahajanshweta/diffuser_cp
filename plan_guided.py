@@ -90,17 +90,17 @@ states = []
 
 # Use torch.no_grad() to disable gradient computation during inference
 with torch.no_grad():
-    for i in range(500):
+    for i in range(1000, 2000, 1):
         observation = env.reset(seed=i)
         total_reward = 0
         rollout = [observation.copy()]
         states.append(observation.copy())
         
         # Pre-allocate tensors for the entire episode
-        episode_actions = torch.zeros((200, env.action_space.shape[0]), device='cuda')
-        episode_rewards = torch.zeros(200, device='cuda')
+        episode_actions = torch.zeros((50, env.action_space.shape[0]), device='cuda')
+        episode_rewards = torch.zeros(50, device='cuda')
         
-        for t in range(200):
+        for t in range(50):
             if t % 10 == 0: print(args.savepath, flush=True)
 
             state = env.state_vector().copy()
@@ -120,7 +120,6 @@ with torch.no_grad():
             
             total_reward += reward
             rollout.append(next_observation.copy())
-            env.render()
             if terminal:
                 break
 
@@ -129,23 +128,13 @@ with torch.no_grad():
         # Process the entire episode at once
         rewards.append(total_reward)
         print(f'i: {i} |   R: {total_reward:.2f}', flush=True)
-        
-        if i == 249:
-            print("saving")
-            filehandler = open("data/diffuser_"+ args.dataset + "_states","wb")
-            pickle.dump(states,filehandler)
-            filehandler.close()
-
-            filehandler = open("data/diffuser_" + args.dataset + "_rewards","wb")
-            pickle.dump(rewards,filehandler)
-            filehandler.close()
 
 # Final save
-filehandler = open("data/diffuser_"+ args.dataset + "_states","wb")
+filehandler = open("data/diffuser_train_"+ args.dataset + "_states","wb")
 pickle.dump(states,filehandler)
 filehandler.close()
 
-filehandler = open("data/diffuser_" + args.dataset + "_rewards","wb")
+filehandler = open("data/diffuser_train_" + args.dataset + "_rewards","wb")
 pickle.dump(rewards,filehandler)
 filehandler.close()
 
