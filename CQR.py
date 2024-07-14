@@ -8,38 +8,43 @@ from huggingface_sb3 import load_from_hub
 from sklearn.ensemble import GradientBoostingRegressor
 import torch
 from mujoco_py import MjSimState
+import sys
+import matplotlib.pyplot as plt
 
-dataset = 'hopper-medium-replay-v2'
+dataset = sys.argv[1]
 
 # 'states' and 'rewardpredictions' from the diffuser 
-file = open("data/diffuser" + dataset + "_rewards", 'rb')
+file = open("data50/diffuser_" + dataset + "_rewards", 'rb')
 reward_predictions = pickle.load(file)
 file.close()
 
-file = open("data/diffuser_" + dataset + "_states", 'rb')
+file = open("data50/diffuser_" + dataset + "_states", 'rb')
 states = pickle.load(file)
 file.close()
 
-file = open("data/SAC_hopper_rewards", 'rb')
+file = open("data50/SAC_"+ dataset +"_rewards", 'rb')
 rewards = pickle.load(file)
 file.close()
 
-file = open("data/calib_states_index", 'rb')
+file = open("data50/calib_states_index", 'rb')
 calib_states_index = pickle.load(file)
 file.close()
 
-file = open("data/test_states_index", 'rb')
+file = open("data50/test_states_index", 'rb')
 test_states_index = pickle.load(file)
 file.close()
 
-train_states_index, calibindex, , _ = train_test_split(
-    calib_states_index, calib_states_index, test_size=0.1, random_state=42
-)
+file = open("data/diffuser_train_" + dataset + "_states", 'rb')
+X_train = pickle.load(file)
+file.close()
 
-X_train = [states[index] for index in train_states_index]
-y_train = [reward_predictions[index] for index in train_states_index]
-X_cal = [states[index] for index in calib_index]
-y_cal = [rewards[index] for index in calib_index]
+file = open("data/diffuser_train_" + dataset + "_rewards", 'rb')
+y_train = pickle.load(file)
+file.close()
+
+
+X_cal = [states[index] for index in calib_states_index]
+y_cal = [rewards[index] for index in calib_states_index]
 X_test = [states[index] for index in test_states_index]
 y_test = [rewards[index] for index in test_states_index]
 
@@ -77,7 +82,8 @@ lower_scores = compute_conformity_scores(lower_model, X_cal, y_cal, lower_quanti
 upper_scores = compute_conformity_scores(upper_model, X_cal, y_cal, upper_quantile)
 cal_scores = np.maximum(lower_scores, upper_scores)
 
-qhat = np.quantile(cal_scores, (1 - alpha))
+n = len(X_cal)
+qhat = np.quantile(cal_scores, np.ceil((n+1)*(1-alpha))/n, method='higher')
 
 lower_pred = lower_model.predict(X_test) - qhat
 upper_pred = upper_model.predict(X_test) + qhat
@@ -100,23 +106,31 @@ def get_scores(X, Y):
 # Combine calibration and validation data
 X = X_cal + X_test
 Y = y_cal + y_test
-n = len(X_cal)  # number of calibration points
+n = len(X)//2  # number of calibration points
 n_val = len(X_test)  # number of validation points
 
 scores = get_scores(X, Y)
 
 # calculate the coverage R times and store in list
-R = 1000  # number of repetitions
+R = 100  # number of repetitions
 coverages = np.zeros((R,))
-
+interval_widths = np.zeros((R,))
 for r in range(R):
     np.random.shuffle(scores)  # shuffle
     calib_scores, val_scores = scores[:n], scores[n:]  # split
-    qhat = np.quantile(calib_scores, np.ceil((n+1)*(1-alpha)/n)/n, method='higher')  # calibrate
+    qhat = np.quantile(calib_scores, np.ceil((n+1)*(1-alpha))/n, method='higher')  # calibrate
     coverages[r] = (val_scores <= qhat).astype(float).mean()  # see caption
+    
+    # Calculate interval width for validation set
+    lower_pred = lower_model.predict(X_test) - qhat
+    upper_pred = upper_model.predict(X_test) + qhat
+    interval_widths[r] = np.mean(upper_pred - lower_pred)
+
 
 average_coverage = coverages.mean()  # should be close to 1-alpha
+average_interval_width = interval_widths.mean()
 print(f"Average coverage: {average_coverage:.4f}")
+print(f"Average interval width: {average_interval_width:.4f}")
 
 plt.hist(coverages)  # should be roughly centered at 1-alpha
 plt.title("Distribution of Coverages")

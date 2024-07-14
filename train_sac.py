@@ -1,5 +1,6 @@
-import gym
+
 import d4rl
+import gym
 from stable_baselines3 import SAC
 from stable_baselines3.common.evaluation import evaluate_policy
 
