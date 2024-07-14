@@ -1,25 +1,24 @@
-
 import gym
+import d4rl
 from stable_baselines3 import SAC
-from stable_baselines3.common.callbacks import CheckpointCallback, EvalCallback
+from stable_baselines3.common.evaluation import evaluate_policy
 
 # Create the environment
 env = gym.make('maze2d-medium-v1')
 
-# Create the SAC model
-model = SAC('MlpPolicy', env, verbose=1)
-
-# Set up a callback to save the model every 10,000 steps
-checkpoint_callback = CheckpointCallback(save_freq=10000, save_path='logs/',
-                                         name_prefix='sac_maze2d_model')
-
-# Set up an evaluation callback
-eval_callback = EvalCallback(env, best_model_save_path='logs/best_model',
-                             log_path='logs/results', eval_freq=5000,
-                             deterministic=True, render=False)
+# Initialize the SAC model
+model = SAC("MlpPolicy", env, tensorboard_log="./sac_maze2d_medium_tensorboard/")
 
 # Train the model
-model.learn(total_timesteps=int(1e6), callback=[checkpoint_callback, eval_callback])
+total_timesteps = 1000000
+model.learn(total_timesteps=total_timesteps, log_interval=10)
 
-# Save the final model
-model.save("sac_maze2d_large")
+# Save the trained model
+model.save("sac_maze2d_medium")
+
+# Evaluate the trained model
+mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=10)
+print(f"Mean reward: {mean_reward:.2f} +/- {std_reward:.2f}")
+
+# Close the environment
+env.close()
