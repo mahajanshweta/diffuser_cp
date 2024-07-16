@@ -5,7 +5,7 @@ from stable_baselines3 import SAC
 from stable_baselines3.common.evaluation import evaluate_policy
 
 # Create the environment
-env = gym.make('maze2d-medium-v1')
+env = gym.make('hopper-medium-v2')
 
 # Initialize the SAC model
 model = SAC("MlpPolicy", env, tensorboard_log="./sac_maze2d_medium_tensorboard/")

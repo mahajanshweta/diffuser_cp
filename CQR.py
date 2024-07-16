@@ -119,7 +119,7 @@ for r in range(R):
     np.random.shuffle(scores)  # shuffle
     calib_scores, val_scores = scores[:n], scores[n:]  # split
     qhat = np.quantile(calib_scores, np.ceil((n+1)*(1-alpha))/n, method='higher')  # calibrate
-    coverages[r] = (val_scores <= qhat).astype(float).mean()  # see caption
+    coverages[r] = (val_scores <= qhat).astype(float).mean()  
     
     # Calculate interval width for validation set
     lower_pred = lower_model.predict(X_test) - qhat
