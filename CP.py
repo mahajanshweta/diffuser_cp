@@ -34,8 +34,8 @@ def generate_sac_rewards(env, sac_model, states, num_episodes, num_steps):
         udd_state = env.sim.get_state().udd_state
         qpos = np.zeros(env.sim.model.nq)
         qvel = np.zeros(env.sim.model.nv)
-        qpos[1:] = states[i][:8] 
-        qvel[:] = states[i][8:]
+        qpos[1:] = states[i][:5] 
+        qvel[:] = states[i][5:]
         new_state = MjSimState(env.sim.data.time, qpos, qvel, env.sim.data.act, udd_state)
         env.sim.set_state(new_state)
         env.sim.forward()
@@ -102,16 +102,17 @@ def get_scores(reward_predictions, rewards):
 def main():
     np.random.seed(42)
     torch.manual_seed(42)
-    
-    repo_id = "sb3/sac-" + sys.argv[2] + "-v3"
-    filename = "sac-" + sys.argv[2] + "-v3.zip"
+    device="cuda"
+    #repo_id = "sb3/sac-" + sys.argv[2] + "-v3"
+    #filename = "sac-" + sys.argv[2] + "-v3.zip"
     dataset = sys.argv[1]
     num_episodes = 1000
     num_steps = 50
-    
-    sac_model = load_sac_model(repo_id, filename)
-    
     env = gym.make(dataset)
+    model_path = "data/sac_" + dataset + ".zip"
+    sac_model = model = SAC.load(model_path, env=env, device=device)
+    #sac_model = load_sac_model(repo_id, filename)
+    
     reward_predictions, states = load_data(dataset)
     print(len(reward_predictions), len(states))
     
@@ -121,7 +122,6 @@ def main():
     print(f"Average Reward (Diffuser): {np.mean(reward_predictions):.2f} ± {np.std(reward_predictions):.2f}")
     print(f"Average Reward (SAC): {np.mean(rewards):.2f} ± {np.std(rewards):.2f}")
 
-    
     (test_states, test_rewards, calib_states, calib_rewards, 
      reward_predictions_calib, reward_predictions_test, 
      calib_states_index, test_states_index) = split_data(states, rewards, reward_predictions)
@@ -131,7 +131,7 @@ def main():
     coverage, average_interval_width = calculate_metrics(calib_rewards, reward_predictions_calib, 
                                                          test_rewards, reward_predictions_test)
     
-    print(f"Coverage Probability: {coverage:.2f}")
+    print(f"Coverage Probability: {coverage:.4f}")
     print(f"Interval Width: {average_interval_width:.4f}")
    
     coverage_calib_set, width_calib_set = plot_calibration_size_impact(calib_rewards, reward_predictions_calib,test_rewards,reward_predictions_test, dataset)
@@ -163,23 +163,22 @@ def main():
         coverages[r] = np.mean((val_rewards >= lower_bounds) & (val_rewards <= upper_bounds))
         interval_widths[r] = np.mean(upper_bounds - lower_bounds)
     
-    average_coverage = coverages.mean()  # should be close to 1-alpha
-    average_interval_width = interval_widths.mean()
+    average_coverageR = coverages.mean()  # should be close to 1-alpha
+    average_interval_widthR = interval_widths.mean()
     
-    print(f"Average Coverage: {average_coverage:.4f} ± {np.std(coverages):.2f}")
-    print(f"Average interval width: {average_interval_width:.4f} ± {np.std(interval_widths):.2f}")
+    print(f"Average Coverage: {average_coverageR:.4f} ± {np.std(coverages):.4f}")
+    print(f"Average interval width: {average_interval_widthR:.4f} ± {np.std(interval_widths):.4f}")
 
-
-    with open('results.csv', 'a', newline='') as csvfile:
+    with open('resultsCP.csv', 'a', newline='') as csvfile:
         writer = csv.writer(csvfile, delimiter=' ',
                             quotechar='|', quoting=csv.QUOTE_MINIMAL)
         writer.writerow([dataset])
         writer.writerow([f"Average Reward (Diffuser): {np.mean(reward_predictions):.2f} ± {np.std(reward_predictions):.2f}"])
         writer.writerow([f"Average Reward (SAC): {np.mean(rewards):.2f} ± {np.std(rewards):.2f}"])
-        writer.writerow([f"Coverage Probability: {coverage:.2f}"])
+        writer.writerow([f"Coverage Probability: {coverage:.4f}"])
         writer.writerow([f"Interval Width: {average_interval_width:.4f}"])
-        writer.writerow([f"Average Coverage: {average_coverage:.4f} ± {np.std(coverages):.2f}"])
-        writer.writerow([f"Average interval width: {average_interval_width:.4f} ± {np.std(interval_widths):.2f}"])
+        writer.writerow([f"Average Coverage: {average_coverageR:.4f} ± {np.std(coverages):.4f}"])
+        writer.writerow([f"Average interval width: {average_interval_widthR:.4f} ± {np.std(interval_widths):.4f}"])
         writer.writerow([f"Coverage on different calib set sizes: {coverage_calib_set}"])
         writer.writerow([f"Interval widths on different calib set sizes: {width_calib_set}"])
         writer.writerow([])
@@ -191,9 +190,6 @@ def main():
     plt.axvline(1-alpha, color='r', linestyle='dashed', linewidth=2, label=f'1-alpha ({1-alpha:.2f})')
     plt.legend()
     plt.show()'''
-
-    
-
    
 
 def plot_calibration_size_impact(calib_rewards, reward_predictions_calib, test_rewards, reward_predictions_test, dataset):
@@ -208,7 +204,6 @@ def plot_calibration_size_impact(calib_rewards, reward_predictions_calib, test_r
         coverages.append(coverage)
         interval_widths.append(interval_width)
         calib_sizes.append(calib_size)
-    
     
     # Plot results
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))

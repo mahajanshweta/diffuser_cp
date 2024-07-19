@@ -1,0 +1,72 @@
+hopper-medium-v2
+|Coverage Probability: 0.90|
+|Interval Width: 9.6462|
+|Average Coverage: 0.9035 ± 0.0187|
+|Average interval width: 9.6436 ± 0.0400|
+|Coverage on different calib set sizes: [0.92, 0.88, 0.905, 0.91, 0.905, 0.9, 0.9, 0.9]|
+|Interval widths on different calib set sizes: [9.728030057740908, 9.548701653701299, 9.653157276434028, 9.67218063580273, 9.66887872510594, 9.64539644074304, 9.6479874240633, 9.646228454317137]|
+
+halfcheetah-medium-v2
+|Coverage Probability: 0.89|
+|Interval Width: 117.7395|
+|Average Coverage: 0.9021 ± 0.0199|
+|Average interval width: 118.5275 ± 1.2468|
+|Coverage on different calib set sizes: [0.91, 0.885, 0.885, 0.9, 0.895, 0.885, 0.885, 0.885]|
+|Interval widths on different calib set sizes: [120.96444535706013, 117.34000245726729, 117.34000245726729, 120.54765842913065, 119.11088906875909, 118.74589847834672, 117.73947984662813, 117.73947984662813]|
+
+walker2d-medium-v2
+|Coverage Probability: 0.92|
+|Interval Width: 21.6463|
+|Average Coverage: 0.9043 ± 0.0173|
+|Average interval width: 21.6173 ± 0.1248|
+|Coverage on different calib set sizes: [0.93, 0.94, 0.94, 0.93, 0.915, 0.915, 0.915, 0.915]|
+|Interval widths on different calib set sizes: [21.92069390042778, 22.008049440958242, 22.008049440958242, 21.92069390042778, 21.675921704552337, 21.69242438380405, 21.6445424484315, 21.646298553395663]|
+
+hopper-medium-expert-v2
+|Coverage Probability: 0.86|
+|Interval Width: 6.0195|
+|Average Coverage: 0.9022 ± 0.0184|
+|Average interval width: 6.0458 ± 0.0228|
+|Coverage on different calib set sizes: [0.84, 0.84, 0.91, 0.91, 0.91, 0.9, 0.88, 0.86]|
+|Interval widths on different calib set sizes: [6.00073229387177, 6.00073229387177, 6.122651237301218, 6.098982170179702, 6.096751302045268, 6.055305286673806, 6.040546740021987, 6.019481572863574]|
+
+halfcheetah-medium-expert-v2
+|Coverage Probability: 0.93|
+|Interval Width: 33.8487|
+|Average Coverage: 0.9036 ± 0.0182|
+|Average interval width: 33.1503 ± 1.5404|
+|Coverage on different calib set sizes: [0.91, 0.925, 0.925, 0.925, 0.925, 0.93, 0.925, 0.925]|
+|Interval widths on different calib set sizes: [31.125441357241954, 34.212851190937926, 34.212851190937926, 34.74297422340251, 34.74297422340251, 35.13554919604249, 34.114850405647104, 33.848746115018486]|
+
+walker2d-medium-expert-v2
+|Coverage Probability: 0.88|
+|Interval Width: 65.9317|
+|Average Coverage: 0.8984 ± 0.0181|
+|Average interval width: 66.0710 ± 0.3107|
+|Coverage on different calib set sizes: [0.875, 0.875, 0.875, 0.875, 0.875, 0.875, 0.875, 0.875]|
+|Interval widths on different calib set sizes: [65.93173732955796, 65.93173732955796, 66.04330827751704, 66.10099681120855, 66.02759333817247, 66.04330827751704, 66.02884438750587, 65.93173732955796]|
+
+hopper-medium-replay-v2
+|Coverage Probability: 0.90|
+|Interval Width: 3.3962|
+|Average Coverage: 0.9013 ± 0.0194|
+|Average interval width: 3.4036 ± 0.0495|
+|Coverage on different calib set sizes: [0.89, 0.885, 0.88, 0.885, 0.89, 0.895, 0.9, 0.895]|
+|Interval widths on different calib set sizes: [3.3658256051627995, 3.328770426903278, 3.242823406001295, 3.327141081309494, 3.3658256051627995, 3.3962046729478197, 3.398977586802291, 3.3962046729478197]|
+
+halfcheetah-medium-replay-v2
+|Coverage Probability: 0.89|
+|Interval Width: 174.5539|
+|Average Coverage: 0.9028 ± 0.0175|
+|Average interval width: 174.9556 ± 0.7346|
+|Coverage on different calib set sizes: [0.955, 0.9, 0.93, 0.9, 0.885, 0.885, 0.885, 0.885]|
+|Interval widths on different calib set sizes: [179.3512143830385, 175.69980701510693, 177.08595641410287, 175.69980701510693, 175.12932011552024, 174.3188038642933, 174.91072614469084, 174.5539143425503]|
+
+walker2d-medium-replay-v2
+|Coverage Probability: 0.92|
+|Interval Width: 53.7785|
+|Average Coverage: 0.9012 ± 0.0182|
+|Average interval width: 53.7752 ± 0.1602|
+|Coverage on different calib set sizes: [0.98, 0.95, 0.92, 0.915, 0.915, 0.915, 0.915, 0.915]|
+|Interval widths on different calib set sizes: [56.06485352623771, 54.73932447181586, 54.17087820203086, 53.94704505629512, 53.780384397123505, 53.780384397123505, 53.77846184865881, 53.77846184865881]|
+

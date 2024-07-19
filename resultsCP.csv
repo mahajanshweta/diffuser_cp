@@ -1,0 +1,90 @@
+hopper-medium-v2
+|Average Reward (Diffuser): 83.51 ± 0.68|
+|Average Reward (SAC): 87.84 ± 0.48|
+|Coverage Probability: 0.9100|
+|Interval Width: 10.5000|
+|Average Coverage: 0.9003 ± 0.0197|
+|Average interval width: 10.5109 ± 0.0541|
+|Coverage on different calib set sizes: [0.97, 0.945, 0.935, 0.92, 0.92, 0.91, 0.91, 0.91]|
+|Interval widths on different calib set sizes: [10.871405605376962, 10.744065163521013, 10.665539509914936, 10.57951103408132, 10.57951103408132, 10.53384018288912, 10.512521485019874, 10.500021822627843]|
+
+halfcheetah-medium-v2
+|Average Reward (Diffuser): 109.75 ± 19.85|
+|Average Reward (SAC): 155.87 ± 8.82|
+|Coverage Probability: 0.9100|
+|Interval Width: 145.3310|
+|Average Coverage: 0.9020 ± 0.0166|
+|Average interval width: 145.2246 ± 3.4347|
+|Coverage on different calib set sizes: [0.92, 0.925, 0.92, 0.91, 0.91, 0.91, 0.91, 0.91]|
+|Interval widths on different calib set sizes: [149.39499087482955, 150.15085237921494, 149.39499087482955, 145.3309639064576, 143.87770095860643, 142.48069262886588, 143.6749906424525, 145.3309639064576]|
+
+walker2d-medium-v2
+|Average Reward (Diffuser): 74.29 ± 3.65|
+|Average Reward (SAC): 82.83 ± 1.91|
+|Coverage Probability: 0.9050|
+|Interval Width: 26.3630|
+|Average Coverage: 0.9038 ± 0.0160|
+|Average interval width: 26.4342 ± 0.3211|
+|Coverage on different calib set sizes: [0.905, 0.935, 0.905, 0.905, 0.905, 0.905, 0.905, 0.905]|
+|Interval widths on different calib set sizes: [26.37315684868699, 27.59500969288726, 26.446210810201336, 26.37315684868699, 26.3630382090563, 26.455316571661598, 26.37315684868699, 26.363007420819457]|
+
+hopper-medium-expert-v2
+|Average Reward (Diffuser): 83.64 ± 0.68|
+|Average Reward (SAC): 86.41 ± 0.41|
+|Coverage Probability: 0.9250|
+|Interval Width: 6.6864|
+|Average Coverage: 0.9022 ± 0.0189|
+|Average interval width: 6.6729 ± 0.0392|
+|Coverage on different calib set sizes: [0.915, 0.915, 0.925, 0.915, 0.92, 0.925, 0.92, 0.925]|
+|Interval widths on different calib set sizes: [6.6324141023239065, 6.635060896604472, 6.68638936605484, 6.635060896604472, 6.657412728695817, 6.68631173370909, 6.663950668315863, 6.68638936605484]|
+
+halfcheetah-medium-expert-v2
+|Average Reward (Diffuser): 175.40 ± 12.65|
+|Average Reward (SAC): 171.20 ± 10.39|
+|Coverage Probability: 0.9300|
+|Interval Width: 52.5639|
+|Average Coverage: 0.9034 ± 0.0181|
+|Average interval width: 51.8926 ± 1.7437|
+|Coverage on different calib set sizes: [0.93, 0.955, 0.93, 0.93, 0.93, 0.93, 0.93, 0.93]|
+|Interval widths on different calib set sizes: [54.38089753059381, 59.02581227940137, 54.38089753059381, 52.78600847482039, 52.563857386089694, 53.04270185454493, 53.04270185454493, 52.563857386089694]|
+
+walker2d-medium-expert-v2
+|Average Reward (Diffuser): 83.24 ± 2.82|
+|Average Reward (SAC): 92.61 ± 19.85|
+|Coverage Probability: 0.8550|
+|Interval Width: 64.5072|
+|Average Coverage: 0.9009 ± 0.0196|
+|Average interval width: 65.0566 ± 0.6331|
+|Coverage on different calib set sizes: [0.855, 0.855, 0.855, 0.855, 0.855, 0.855, 0.855, 0.855]|
+|Interval widths on different calib set sizes: [64.31756517075134, 64.16909198812833, 64.59410530877926, 64.6782556935817, 64.6782556935817, 64.87774547470588, 64.60773076999517, 64.50722073618931]|
+
+hopper-medium-replay-v2
+|Average Reward (Diffuser): 84.66 ± 1.20|
+|Average Reward (SAC): 86.19 ± 0.53|
+|Coverage Probability: 0.9300|
+|Interval Width: 5.4091|
+|Average Coverage: 0.9009 ± 0.0196|
+|Average interval width: 5.3842 ± 0.0403|
+|Coverage on different calib set sizes: [0.94, 0.93, 0.93, 0.925, 0.93, 0.93, 0.93, 0.93]|
+|Interval widths on different calib set sizes: [5.5808455905683445, 5.38268783498313, 5.358882592157244, 5.3434969461065975, 5.417087911190293, 5.41100292643759, 5.41100292643759, 5.409142081414188]|
+
+halfcheetah-medium-replay-v2
+|Average Reward (Diffuser): 99.16 ± 24.72|
+|Average Reward (SAC): 168.00 ± 9.80|
+|Coverage Probability: 0.9200|
+|Interval Width: 212.9945|
+|Average Coverage: 0.9016 ± 0.0174|
+|Average interval width: 211.1086 ± 4.5058|
+|Coverage on different calib set sizes: [0.945, 0.92, 0.925, 0.925, 0.92, 0.92, 0.92, 0.92]|
+|Interval widths on different calib set sizes: [231.9093037169349, 214.64317183425504, 218.17268409875473, 218.17268409875473, 214.33481820287565, 213.9922288987435, 212.99454688238254, 212.99454688238254]|
+
+walker2d-medium-replay-v2
+|Average Reward (Diffuser): 68.45 ± 7.84|
+|Average Reward (SAC): 93.13 ± 0.71|
+|Coverage Probability: 0.9000|
+|Interval Width: 68.7829|
+|Average Coverage: 0.9002 ± 0.0193|
+|Average interval width: 68.8196 ± 0.9527|
+|Coverage on different calib set sizes: [0.945, 0.9, 0.895, 0.895, 0.895, 0.895, 0.895, 0.9]|
+|Interval widths on different calib set sizes: [76.23194477060296, 69.43663629481057, 68.16452837805934, 68.0285001716993, 68.11313001027577, 68.0285001716993, 68.4258824070954, 68.78289009961782]|
+
