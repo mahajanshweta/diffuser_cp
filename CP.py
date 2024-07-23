@@ -14,6 +14,7 @@ from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.stats import beta
+from sklearn.neighbors import NearestNeighbors
 
 
 def load_sac_model(repo_id, filename):
@@ -83,7 +84,7 @@ def save_split_indices(calib_states_index, test_states_index):
         pickle.dump(test_states_index, filehandler)
 
 
-def calculate_metrics(calib_rewards, reward_predictions_calib, test_rewards, reward_predictions_test, alpha=0.1):
+def calculate_metrics(calib_rewards, reward_predictions_calib, test_rewards, reward_predictions_test, calib_states, test_states, alpha=0.1):
     residuals = np.abs(np.array(calib_rewards) - np.array(reward_predictions_calib))
     n = len(calib_rewards)
     qhat = np.quantile(residuals, np.ceil((n+1)*(1-alpha))/n, method='higher')
@@ -95,6 +96,7 @@ def calculate_metrics(calib_rewards, reward_predictions_calib, test_rewards, rew
     average_interval_width = np.mean(upper_bounds - lower_bounds)
     
     return coverage, average_interval_width
+    
 
 def get_scores(reward_predictions, rewards):
     return np.abs(np.array(rewards) - np.array(reward_predictions))
@@ -109,15 +111,16 @@ def main():
     num_episodes = 1000
     num_steps = 50
     env = gym.make(dataset)
-    model_path = "data/sac_" + dataset + ".zip"
+    model_path = "data/sac_" + dataset 
     sac_model = model = SAC.load(model_path, env=env, device=device)
     #sac_model = load_sac_model(repo_id, filename)
     
     reward_predictions, states = load_data(dataset)
     print(len(reward_predictions), len(states))
     
+    #rewards = generate_sac_rewards(env, sac_model, states, num_episodes, num_steps, reward_predictions)
+    #save_rewards(rewards, dataset)
     rewards = get_sac_rewards(dataset)
-    save_rewards(rewards, dataset)
     
     print(f"Average Reward (Diffuser): {np.mean(reward_predictions):.2f} ± {np.std(reward_predictions):.2f}")
     print(f"Average Reward (SAC): {np.mean(rewards):.2f} ± {np.std(rewards):.2f}")
@@ -129,12 +132,12 @@ def main():
     save_split_indices(calib_states_index, test_states_index)
     
     coverage, average_interval_width = calculate_metrics(calib_rewards, reward_predictions_calib, 
-                                                         test_rewards, reward_predictions_test)
+                                                         test_rewards, reward_predictions_test, calib_states, test_states)
     
     print(f"Coverage Probability: {coverage:.4f}")
     print(f"Interval Width: {average_interval_width:.4f}")
    
-    coverage_calib_set, width_calib_set = plot_calibration_size_impact(calib_rewards, reward_predictions_calib,test_rewards,reward_predictions_test, dataset)
+    coverage_calib_mean, width_calib_mean, coverage_calib_std, width_calib_std = plot_calibration_size_impact(calib_rewards, reward_predictions_calib,test_rewards,reward_predictions_test, calib_states, test_states, dataset)
 
     scores = get_scores(reward_predictions, rewards)
     R=100
@@ -163,6 +166,13 @@ def main():
         coverages[r] = np.mean((val_rewards >= lower_bounds) & (val_rewards <= upper_bounds))
         interval_widths[r] = np.mean(upper_bounds - lower_bounds)
     
+    filehandler = open("data/coverage_rtrials_" + dataset,"wb")
+    pickle.dump(coverages,filehandler)
+    filehandler.close()
+    filehandler = open("data/lengths_rtrials_" + dataset ,"wb")
+    pickle.dump(interval_widths,filehandler)
+    filehandler.close()
+
     average_coverageR = coverages.mean()  # should be close to 1-alpha
     average_interval_widthR = interval_widths.mean()
     
@@ -179,8 +189,10 @@ def main():
         writer.writerow([f"Interval Width: {average_interval_width:.4f}"])
         writer.writerow([f"Average Coverage: {average_coverageR:.4f} ± {np.std(coverages):.4f}"])
         writer.writerow([f"Average interval width: {average_interval_widthR:.4f} ± {np.std(interval_widths):.4f}"])
-        writer.writerow([f"Coverage on different calib set sizes: {coverage_calib_set}"])
-        writer.writerow([f"Interval widths on different calib set sizes: {width_calib_set}"])
+        writer.writerow([f"Mean of Coverage on different calib set sizes: {coverage_calib_mean}"])
+        writer.writerow([f"Mean Interval widths on different calib set sizes: {width_calib_mean}"])
+        writer.writerow([f"Std of Coverage on different calib set sizes: {coverage_calib_std}"])
+        writer.writerow([f"std of Interval widths on different calib set sizes: {width_calib_std}"])
         writer.writerow([])
     
     '''plt.hist(coverages)
@@ -192,21 +204,44 @@ def main():
     plt.show()'''
    
 
-def plot_calibration_size_impact(calib_rewards, reward_predictions_calib, test_rewards, reward_predictions_test, dataset):
+def plot_calibration_size_impact(calib_rewards, reward_predictions_calib, test_rewards, reward_predictions_test, calib_states, test_states, dataset):
     alpha =0.1
-    coverages = []
-    interval_widths = []
-    calib_sizes = []
-    test_size = 200
-    for calib_size in range(100, 900, 100):
-        coverage, interval_width = calculate_metrics(calib_rewards[:calib_size], reward_predictions_calib[:calib_size], 
-                                                         test_rewards[:test_size], reward_predictions_test[:test_size])
-        coverages.append(coverage)
-        interval_widths.append(interval_width)
-        calib_sizes.append(calib_size)
     
+    coverages_mean = []
+    interval_widths_mean = []
+    coverages_std = []
+    interval_widths_std = []
+    calib_data_over_R = {}
+    test_size = 200
+    R = 100
+    coverages = []*R
+    interval_widths = []*R
+ 
+    for calib_size in range(100, 900, 100):
+        coverages = []
+        interval_widths = []
+        for r in range(R):
+            np.random.shuffle(calib_rewards)
+            np.random.shuffle(reward_predictions_calib) 
+            np.random.shuffle(test_rewards)
+            np.random.shuffle(reward_predictions_test)
+            coverage, interval_width = calculate_metrics(calib_rewards[:calib_size], reward_predictions_calib[:calib_size], 
+                                                    test_rewards[:test_size], reward_predictions_test[:test_size], calib_states[:calib_size], test_states[:test_size])
+            coverages.append(coverage)
+            interval_widths.append(interval_width)
+
+        calib_data_over_R[calib_size] = (coverages, interval_widths)
+
+        coverages_mean.append(np.array(coverages).mean())
+        interval_widths_mean.append(np.array(interval_widths).mean())
+        coverages_std.append(np.array(coverages).std())
+        interval_widths_std.append(np.array(interval_widths).std())
+
+    filehandler = open("data/calib_set_size_over_R" + dataset,"wb")
+    pickle.dump(calib_data_over_R, filehandler)
+    filehandler.close()
     # Plot results
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    '''fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
     
     ax1.plot(calib_sizes, coverages, marker='o')
     ax1.set_xlabel('Calibration Set Size')
@@ -221,8 +256,8 @@ def plot_calibration_size_impact(calib_rewards, reward_predictions_calib, test_r
     ax2.set_title('Interval Width vs Calibration Set Size')
     
     plt.tight_layout()
-    plt.savefig("plots/cp" + dataset + ".png")
-    return coverages, interval_widths
+    plt.savefig("plots/cp" + dataset + ".png")'''
+    return coverages_mean, interval_widths_mean, coverages_std, interval_widths_std
 
 if __name__ == "__main__":
     main()

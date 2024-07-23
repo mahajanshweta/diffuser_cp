@@ -67,6 +67,9 @@ upper_model = GradientBoostingRegressor(
     max_depth=5, min_samples_leaf=50, random_state=42
 )
 
+lower_model.fit(X_train, y_train)
+upper_model.fit(X_train, y_train)
+
 def compute_conformity_scores(model, X, y, quantile):
     predictions = model.predict(X)
     if quantile < 0.5:
@@ -74,10 +77,8 @@ def compute_conformity_scores(model, X, y, quantile):
     else:
         return np.maximum(y - predictions, 0)
 
-def calculate_metrics(X_train, y_train, X_cal, y_cal, X_test, y_test):
+def calculate_metrics(lower_model, upper_model, X_cal, y_cal, X_test, y_test):
 
-    lower_model.fit(X_train, y_train)
-    upper_model.fit(X_train, y_train)
 
     lower_scores = compute_conformity_scores(lower_model, X_cal, y_cal, lower_quantile)
     upper_scores = compute_conformity_scores(upper_model, X_cal, y_cal, upper_quantile)
@@ -93,25 +94,38 @@ def calculate_metrics(X_train, y_train, X_cal, y_cal, X_test, y_test):
     avg_width = np.mean(upper_pred - lower_pred)
     return coverage, avg_width
 
-coverage, avg_width = calculate_metrics(X_train, y_train, X_cal, y_cal, X_test, y_test)
+coverage, avg_width = calculate_metrics(lower_model, upper_model, X_cal, y_cal, X_test, y_test)
 
 print(f"CQR Coverage: {coverage:.2f}")
 print(f"CQR Average interval width: {avg_width:.4f}")
 
-def plot_calibration_size_impact(X_train, y_train, X_cal, y_cal, X_test, y_test):
+def plot_calibration_size_impact(lower_model, upper_model, X_cal, y_cal, X_test, y_test):
     alpha = 0.1
-    coverages_cs = []
-    interval_widths_cs = []
+    R = 100
+    
     calib_sizes = []
+    calib_data_over_R_CQR = {}
     test_size = 200
     for calib_size in range(100, 900, 100):
-        coverage, interval_width = calculate_metrics(X_train, y_train, X_cal[:calib_size], y_cal[:calib_size], X_test, y_test)
-        coverages_cs.append(coverage)
-        interval_widths_cs.append(interval_width)
-        calib_sizes.append(calib_size)
+        coverages_cs = []*R
+        interval_widths_cs = []*R
+        for r in range(R):
+            np.random.shuffle(X_cal)
+            np.random.shuffle(y_cal)
+            np.random.shuffle(X_test)
+            np.random.shuffle(y_test)
+            coverage, interval_width = calculate_metrics(lower_model, upper_model, X_cal[:calib_size], y_cal[:calib_size], X_test, y_test)
+            coverages_cs.append(coverage)
+            interval_widths_cs.append(interval_width)
+            calib_sizes.append(calib_size)
+        calib_data_over_R_CQR[calib_size] = (coverages_cs, interval_widths_cs)
+
+    filehandler = open("data/calib_size_over_R_CQR_" + dataset, "wb")
+    pickle.dump(calib_data_over_R_CQR, filehandler)
+    filehandler.close()
     return coverages_cs, interval_widths_cs
 
-coverages_cs, interval_widths_cs = plot_calibration_size_impact(X_train, y_train, X_cal, y_cal, X_test, y_test)
+coverages_cs, interval_widths_cs = plot_calibration_size_impact(lower_model, upper_model, X_cal, y_cal, X_test, y_test)
 
 def get_scores(X, Y):
     lower_scores = compute_conformity_scores(lower_model, X, Y, lower_quantile)
@@ -147,13 +161,13 @@ average_interval_width = interval_widths.mean()
 print(f"Average coverage: {average_coverage:.4f} ± {np.std(coverages):.4f}")
 print(f"Average interval width: {average_interval_width:.4f}± {np.std(interval_widths):.4f}")
 
-plt.hist(coverages)  # should be roughly centered at 1-alpha
-plt.title("Distribution of Coverages")
-plt.xlabel("Coverage")
+'''plt.hist(interval_widths)  # should be roughly centered at 1-alpha
+plt.title("Distribution of widths")
+plt.xlabel("widths")
 plt.ylabel("Frequency")
-plt.axvline(x=1-alpha, color='r', linestyle='--', label='Target Coverage (1-alpha)')
+#plt.axvline(x=1-alpha, color='r', linestyle='--', label='Target Coverage (1-alpha)')
 plt.legend()
-plt.show()
+plt.show()'''
 
 with open('resultsCQR.csv', 'a', newline='') as csvfile:
     writer = csv.writer(csvfile, delimiter=' ',
@@ -166,3 +180,4 @@ with open('resultsCQR.csv', 'a', newline='') as csvfile:
     writer.writerow([f"Coverage on different calib set sizes: {coverages_cs}"])
     writer.writerow([f"Interval widths on different calib set sizes: {interval_widths_cs}"])
     writer.writerow([])
+
