@@ -3,19 +3,20 @@ import gym
 import numpy as np
 import pickle
 import csv
+import sys
+import torch
+import matplotlib.pyplot as plt
 from stable_baselines3 import SAC
 from sklearn.model_selection import train_test_split
 from huggingface_sb3 import load_from_hub
 from sklearn.ensemble import GradientBoostingRegressor
-import torch
 from mujoco_py import MjSimState
-import sys
-import csv
-import matplotlib.pyplot as plt
+
+
 
 dataset = sys.argv[1]
 
-# 'states' and 'rewardpredictions' from the diffuser 
+# 'states' and 'reward' predictions from the diffuser 
 file = open("data50/diffuser_" + dataset + "_rewards", 'rb')
 reward_predictions = pickle.load(file)
 file.close()
@@ -70,6 +71,7 @@ upper_model = GradientBoostingRegressor(
 lower_model.fit(X_train, y_train)
 upper_model.fit(X_train, y_train)
 
+#calculate the nonconformity scores
 def compute_conformity_scores(model, X, y, quantile):
     predictions = model.predict(X)
     if quantile < 0.5:
@@ -77,8 +79,8 @@ def compute_conformity_scores(model, X, y, quantile):
     else:
         return np.maximum(y - predictions, 0)
 
+#calibrating the data
 def calculate_metrics(lower_model, upper_model, X_cal, y_cal, X_test, y_test):
-
 
     lower_scores = compute_conformity_scores(lower_model, X_cal, y_cal, lower_quantile)
     upper_scores = compute_conformity_scores(upper_model, X_cal, y_cal, upper_quantile)
@@ -99,6 +101,7 @@ coverage, avg_width = calculate_metrics(lower_model, upper_model, X_cal, y_cal, 
 print(f"CQR Coverage: {coverage:.2f}")
 print(f"CQR Average interval width: {avg_width:.4f}")
 
+#data for calibration size impact
 def plot_calibration_size_impact(lower_model, upper_model, X_cal, y_cal, X_test, y_test):
     alpha = 0.1
     R = 100
@@ -156,10 +159,10 @@ for r in range(R):
     interval_widths[r] = np.mean(upper_pred - lower_pred)
 
 
-average_coverage = coverages.mean()  # should be close to 1-alpha
+average_coverage = coverages.mean()
 average_interval_width = interval_widths.mean()
 print(f"Average coverage: {average_coverage:.4f} ± {np.std(coverages):.4f}")
-print(f"Average interval width: {average_interval_width:.4f}± {np.std(interval_widths):.4f}")
+print(f"Average interval width: {average_interval_width:.4f} ± {np.std(interval_widths):.4f}")
 
 '''plt.hist(interval_widths)  # should be roughly centered at 1-alpha
 plt.title("Distribution of widths")
@@ -169,7 +172,8 @@ plt.ylabel("Frequency")
 plt.legend()
 plt.show()'''
 
-with open('resultsCQR.csv', 'a', newline='') as csvfile:
+#writing the results to a txt file
+with open('resultsCQR.txt', 'a', newline='') as csvfile:
     writer = csv.writer(csvfile, delimiter=' ',
                         quotechar='|', quoting=csv.QUOTE_MINIMAL)
     writer.writerow([dataset])

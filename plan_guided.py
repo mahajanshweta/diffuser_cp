@@ -5,9 +5,7 @@ import diffuser.utils as utils
 import pickle
 import torch
 
-#-----------------------------------------------------------------------------#
-#----------------------------------- setup -----------------------------------#
-#-----------------------------------------------------------------------------#
+#------------------ setup --------------------#
 
 class Parser(utils.Parser):
     dataset: str = 'walker2d-medium-replay-v2'
@@ -16,9 +14,7 @@ class Parser(utils.Parser):
 args = Parser().parse_args('plan')
 
 
-#-----------------------------------------------------------------------------#
-#---------------------------------- loading ----------------------------------#
-#-----------------------------------------------------------------------------#
+#--------------- loading ---------------------#
 
 ## load diffusion model and value function from disk
 diffusion_experiment = utils.load_diffusion(
@@ -50,7 +46,8 @@ logger_config = utils.Config(
     max_render=args.max_render,
 )
 
-## policies are wrappers around an unconditional diffusion model and a value guide
+## policies are wrappers around an unconditional diffusion model and 
+# a value guide
 policy_config = utils.Config(
     args.policy,
     guide=guide,
@@ -70,27 +67,25 @@ logger = logger_config()
 policy = policy_config()
 
 
-#-----------------------------------------------------------------------------#
-#--------------------------------- main loop ---------------------------------#
-#-----------------------------------------------------------------------------#
+#----------------- main loop --------------------#
 
 env = dataset.env
 
-# Use torch.cuda.empty_cache() to clear any unused memory
+# torch.cuda.empty_cache() to clear any unused memory
 torch.cuda.empty_cache()
 
-# Set the default tensor type to CUDA for faster operations
+# default tensor type to CUDA for faster operations
 torch.set_default_tensor_type(torch.cuda.FloatTensor)
 
-# Increase the batch size to utilize more GPU memory
-args.batch_size = 128  # Adjust this value based on your GPU capacity
+# batch size to utilize more GPU memory
+args.batch_size = 128 
 
 rewards = []
 states = []
 
-# Use torch.no_grad() to disable gradient computation during inference
+# torch.no_grad() to disable gradient computation during inference
 with torch.no_grad():
-    for i in range(1000, 2000, 1):
+    for i in range(1000):
         observation = env.reset(seed=i)
         total_reward = 0
         rollout = [observation.copy()]
@@ -137,5 +132,3 @@ filehandler.close()
 filehandler = open("data/diffuser_train_" + args.dataset + "_rewards","wb")
 pickle.dump(rewards,filehandler)
 filehandler.close()
-
-#logger.finish(t, total_reward, terminal, diffusion_experiment, value_experiment)

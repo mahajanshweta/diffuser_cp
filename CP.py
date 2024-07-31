@@ -2,17 +2,17 @@ import d4rl
 import numpy as np
 import gym
 import csv
-from stable_baselines3 import SAC
-import torch
-from tqdm import tqdm
-from huggingface_sb3 import load_from_hub
 import pickle
 import collections
-from mujoco_py import MjSimState
+import torch
 import sys
-from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import seaborn as sns
+from stable_baselines3 import SAC
+from tqdm import tqdm
+from huggingface_sb3 import load_from_hub
+from mujoco_py import MjSimState
+from sklearn.model_selection import train_test_split
 from scipy.stats import beta
 from sklearn.neighbors import NearestNeighbors
 
@@ -83,7 +83,7 @@ def save_split_indices(calib_states_index, test_states_index):
     with open("data50/test_states_index", "wb") as filehandler:
         pickle.dump(test_states_index, filehandler)
 
-
+#calibrating the data and calculating the coverage and interval width
 def calculate_metrics(calib_rewards, reward_predictions_calib, test_rewards, reward_predictions_test, calib_states, test_states, alpha=0.1):
     residuals = np.abs(np.array(calib_rewards) - np.array(reward_predictions_calib))
     n = len(calib_rewards)
@@ -144,7 +144,7 @@ def main():
     alpha=0.1
     n = len(scores) // 2  # Assuming half for calibration, half for validation
     
-    # Calculate the coverage R times and store in list
+    # Calculating the coverage R=100 trials and store it in a file
     coverages = np.zeros((R,))
     interval_widths = np.zeros((R,))
     for r in range(R):
@@ -173,13 +173,13 @@ def main():
     pickle.dump(interval_widths,filehandler)
     filehandler.close()
 
-    average_coverageR = coverages.mean()  # should be close to 1-alpha
+    average_coverageR = coverages.mean()
     average_interval_widthR = interval_widths.mean()
     
     print(f"Average Coverage: {average_coverageR:.4f} ± {np.std(coverages):.4f}")
     print(f"Average interval width: {average_interval_widthR:.4f} ± {np.std(interval_widths):.4f}")
 
-    with open('resultsCP.csv', 'a', newline='') as csvfile:
+    with open('resultsCP.txt', 'a', newline='') as csvfile:
         writer = csv.writer(csvfile, delimiter=' ',
                             quotechar='|', quoting=csv.QUOTE_MINIMAL)
         writer.writerow([dataset])
@@ -205,8 +205,8 @@ def main():
    
 
 def plot_calibration_size_impact(calib_rewards, reward_predictions_calib, test_rewards, reward_predictions_test, calib_states, test_states, dataset):
-    alpha =0.1
     
+    alpha =0.1
     coverages_mean = []
     interval_widths_mean = []
     coverages_std = []
