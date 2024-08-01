@@ -70,6 +70,8 @@ upper_model = GradientBoostingRegressor(
 
 lower_model.fit(X_train, y_train)
 upper_model.fit(X_train, y_train)
+np.random.seed(42)
+torch.manual_seed(42)
 
 #calculate the nonconformity scores
 def compute_conformity_scores(model, X, y, quantile):

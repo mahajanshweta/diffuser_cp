@@ -1,9 +1,11 @@
 import pdb
-
 import diffuser.sampling as sampling
 import diffuser.utils as utils
 import pickle
 import torch
+from PIL import Image
+import cv2
+import numpy as np
 
 #------------------ setup --------------------#
 
@@ -82,10 +84,19 @@ args.batch_size = 128
 
 rewards = []
 states = []
+frames = []
+# Video recording
+fourcc = cv2.VideoWriter_fourcc(*'XVID')
+fps = 30.0  # Frames per second for the output video
+frame_width = int(env.render(mode="rgb_array").shape[1])
+frame_height = int(env.render(mode="rgb_array").shape[0])
+out = cv2.VideoWriter(args.dataset + '.avi', fourcc, fps, (frame_width, frame_height))
+
 
 # torch.no_grad() to disable gradient computation during inference
 with torch.no_grad():
     for i in range(1000):
+       
         observation = env.reset(seed=i)
         total_reward = 0
         rollout = [observation.copy()]
@@ -115,14 +126,21 @@ with torch.no_grad():
             
             total_reward += reward
             rollout.append(next_observation.copy())
+            frame = env.render(mode='rgb_array')
             if terminal:
                 break
 
             observation = next_observation
-        
+
+            out.write(cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
+        out.release()
+
+        print("Video saved as hopper_diffuser.mp4")
         # Process the entire episode at once
         rewards.append(total_reward)
         print(f'i: {i} |   R: {total_reward:.2f}', flush=True)
+
+
 
 # Final save
 filehandler = open("data/diffuser_train_"+ args.dataset + "_states","wb")
