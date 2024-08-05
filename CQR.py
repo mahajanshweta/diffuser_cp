@@ -17,23 +17,23 @@ from mujoco_py import MjSimState
 dataset = sys.argv[1]
 
 # 'states' and 'reward' predictions from the diffuser 
-file = open("data50/diffuser_" + dataset + "_rewards", 'rb')
+file = open("data/diffuser_" + dataset + "_rewards", 'rb')
 reward_predictions = pickle.load(file)
 file.close()
 
-file = open("data50/diffuser_" + dataset + "_states", 'rb')
+file = open("data/diffuser_" + dataset + "_states", 'rb')
 states = pickle.load(file)
 file.close()
 
-file = open("data50/SAC_"+ dataset +"_rewards", 'rb')
+file = open("data/SAC_"+ dataset +"_rewards", 'rb')
 rewards = pickle.load(file)
 file.close()
 
-file = open("data50/calib_states_index", 'rb')
+file = open("data/calib_states_index", 'rb')
 calib_states_index = pickle.load(file)
 file.close()
 
-file = open("data50/test_states_index", 'rb')
+file = open("data/test_states_index", 'rb')
 test_states_index = pickle.load(file)
 file.close()
 

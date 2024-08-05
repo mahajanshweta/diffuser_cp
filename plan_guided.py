@@ -141,7 +141,6 @@ with torch.no_grad():
         print(f'i: {i} |   R: {total_reward:.2f}', flush=True)
 
 
-
 # Final save
 filehandler = open("data/diffuser_train_"+ args.dataset + "_states","wb")
 pickle.dump(states,filehandler)

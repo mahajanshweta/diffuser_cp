@@ -22,9 +22,9 @@ def load_sac_model(repo_id, filename):
     return SAC.load(model_path)
 
 def load_data(dataset):
-    with open(f"data50/diffuser_{dataset}_rewards", 'rb') as file:
+    with open(f"data/diffuser_{dataset}_rewards", 'rb') as file:
         reward_predictions = pickle.load(file)
-    with open(f"data50/diffuser_{dataset}_states", 'rb') as file:
+    with open(f"data/diffuser_{dataset}_states", 'rb') as file:
         states = pickle.load(file)
     return reward_predictions, states
 
@@ -51,11 +51,11 @@ def generate_sac_rewards(env, sac_model, states, num_episodes, num_steps):
     return rewards
 
 def save_rewards(rewards, dataset):
-    with open(f"data50/SAC_{dataset}_rewards", "wb") as filehandler:
+    with open(f"data/SAC_{dataset}_rewards", "wb") as filehandler:
         pickle.dump(rewards, filehandler)
 
 def get_sac_rewards(dataset):
-    with open(f"data50/SAC_{dataset}_rewards", 'rb') as file:
+    with open(f"data/SAC_{dataset}_rewards", 'rb') as file:
         rewards = pickle.load(file)
     return rewards     
 
@@ -78,9 +78,9 @@ def split_data(states, rewards, reward_predictions):
             calib_states_index, test_states_index)
 
 def save_split_indices(calib_states_index, test_states_index):
-    with open("data50/calib_states_index", "wb") as filehandler:
+    with open("data/calib_states_index", "wb") as filehandler:
         pickle.dump(calib_states_index, filehandler)
-    with open("data50/test_states_index", "wb") as filehandler:
+    with open("data/test_states_index", "wb") as filehandler:
         pickle.dump(test_states_index, filehandler)
 
 #calibrating the data and calculating the coverage and interval width
