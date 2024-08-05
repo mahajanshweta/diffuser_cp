@@ -8,7 +8,7 @@ The [main branch](https://github.com/mahajanshweta/diffuser_cp/tree/main) contai
 
 ## Quickstart
 
-Load a pretrained diffusion model and sample from it in your browser with [diffuser-sample.ipynb].
+Load a pretrained diffusion model and sample from it in your browser with [diffuser-sample.ipynb](diffuser-sample.ipynb).
 
 
 ## Installation
@@ -126,3 +126,7 @@ python CQR.py hopper-medium-v2
 ## Plotting 
 
 To plot the results of effect of calibration set size on coverage and interval width, use the jupyter notebook [plotting.ipynb](plotting.ipynb)
+
+## Other files 
+
+We use a diffuser to generate the policy and save the states and rewards as a pickle file in the 'data' folder.

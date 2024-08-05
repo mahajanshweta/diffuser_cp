@@ -12,8 +12,6 @@ from huggingface_sb3 import load_from_hub
 from sklearn.ensemble import GradientBoostingRegressor
 from mujoco_py import MjSimState
 
-
-
 dataset = sys.argv[1]
 
 # 'states' and 'reward' predictions from the diffuser 
@@ -68,6 +66,7 @@ upper_model = GradientBoostingRegressor(
     max_depth=5, min_samples_leaf=50, random_state=42
 )
 
+#fitting the models
 lower_model.fit(X_train, y_train)
 upper_model.fit(X_train, y_train)
 np.random.seed(42)
@@ -132,6 +131,7 @@ def plot_calibration_size_impact(lower_model, upper_model, X_cal, y_cal, X_test,
 
 coverages_cs, interval_widths_cs = plot_calibration_size_impact(lower_model, upper_model, X_cal, y_cal, X_test, y_test)
 
+#compute the nonconformity scores for upper and lower models
 def get_scores(X, Y):
     lower_scores = compute_conformity_scores(lower_model, X, Y, lower_quantile)
     upper_scores = compute_conformity_scores(upper_model, X, Y, upper_quantile)
@@ -165,14 +165,6 @@ average_coverage = coverages.mean()
 average_interval_width = interval_widths.mean()
 print(f"Average coverage: {average_coverage:.4f} ± {np.std(coverages):.4f}")
 print(f"Average interval width: {average_interval_width:.4f} ± {np.std(interval_widths):.4f}")
-
-'''plt.hist(interval_widths)  # should be roughly centered at 1-alpha
-plt.title("Distribution of widths")
-plt.xlabel("widths")
-plt.ylabel("Frequency")
-#plt.axvline(x=1-alpha, color='r', linestyle='--', label='Target Coverage (1-alpha)')
-plt.legend()
-plt.show()'''
 
 #writing the results to a txt file
 with open('resultsCQR.txt', 'a', newline='') as csvfile:

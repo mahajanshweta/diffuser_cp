@@ -1,3 +1,7 @@
+"""
+Code adpated from: Planning with Diffusion for Flexible Behavior Synthesis (
+https://arxiv.org/abs/2205.09991)
+"""
 import socket
 
 from diffuser.utils import watch

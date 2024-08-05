@@ -16,11 +16,12 @@ from sklearn.model_selection import train_test_split
 from scipy.stats import beta
 from sklearn.neighbors import NearestNeighbors
 
-
+#Load the model from the hub
 def load_sac_model(repo_id, filename):
     model_path = load_from_hub(repo_id, filename)
     return SAC.load(model_path)
 
+#Load the data from the diffuser
 def load_data(dataset):
     with open(f"data/diffuser_{dataset}_rewards", 'rb') as file:
         reward_predictions = pickle.load(file)
@@ -28,6 +29,7 @@ def load_data(dataset):
         states = pickle.load(file)
     return reward_predictions, states
 
+#Generate rewards using the SAC model
 def generate_sac_rewards(env, sac_model, states, num_episodes, num_steps):
     rewards = []
     for i in range(num_episodes):
@@ -50,15 +52,18 @@ def generate_sac_rewards(env, sac_model, states, num_episodes, num_steps):
         rewards.append(total_reward)
     return rewards
 
+#Save the rewards
 def save_rewards(rewards, dataset):
     with open(f"data/SAC_{dataset}_rewards", "wb") as filehandler:
         pickle.dump(rewards, filehandler)
 
+#Load the rewards
 def get_sac_rewards(dataset):
     with open(f"data/SAC_{dataset}_rewards", 'rb') as file:
         rewards = pickle.load(file)
     return rewards     
 
+#Split the data into calibration and test sets
 def split_data(states, rewards, reward_predictions):
     index = np.arange(1000)
     test_states_index, calib_states_index, _, _ = train_test_split(
@@ -77,6 +82,7 @@ def split_data(states, rewards, reward_predictions):
             reward_predictions_calib, reward_predictions_test, 
             calib_states_index, test_states_index)
 
+#Save the split indices
 def save_split_indices(calib_states_index, test_states_index):
     with open("data/calib_states_index", "wb") as filehandler:
         pickle.dump(calib_states_index, filehandler)
@@ -97,9 +103,10 @@ def calculate_metrics(calib_rewards, reward_predictions_calib, test_rewards, rew
     
     return coverage, average_interval_width
     
-
+#Get the nonconformity scores
 def get_scores(reward_predictions, rewards):
     return np.abs(np.array(rewards) - np.array(reward_predictions))
+
 
 def main():
     np.random.seed(42)
@@ -194,14 +201,6 @@ def main():
         writer.writerow([f"Std of Coverage on different calib set sizes: {coverage_calib_std}"])
         writer.writerow([f"std of Interval widths on different calib set sizes: {width_calib_std}"])
         writer.writerow([])
-    
-    '''plt.hist(coverages)
-    plt.title("Distribution of Coverage Probabilities")
-    plt.xlabel("Coverage")
-    plt.ylabel("Frequency")
-    plt.axvline(1-alpha, color='r', linestyle='dashed', linewidth=2, label=f'1-alpha ({1-alpha:.2f})')
-    plt.legend()
-    plt.show()'''
    
 
 def plot_calibration_size_impact(calib_rewards, reward_predictions_calib, test_rewards, reward_predictions_test, calib_states, test_states, dataset):
@@ -240,23 +239,7 @@ def plot_calibration_size_impact(calib_rewards, reward_predictions_calib, test_r
     filehandler = open("data/calib_set_size_over_R" + dataset,"wb")
     pickle.dump(calib_data_over_R, filehandler)
     filehandler.close()
-    # Plot results
-    '''fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
-    
-    ax1.plot(calib_sizes, coverages, marker='o')
-    ax1.set_xlabel('Calibration Set Size')
-    ax1.set_ylabel('Coverage')
-    ax1.set_title('Coverage vs Calibration Set Size')
-    ax1.axhline(y=1-alpha, color='r', linestyle='--', label=f'1-α ({1-alpha})')
-    ax1.legend()
-    
-    ax2.plot(calib_sizes, interval_widths, marker='o')
-    ax2.set_xlabel('Calibration Set Size')
-    ax2.set_ylabel('Average Interval Width')
-    ax2.set_title('Interval Width vs Calibration Set Size')
-    
-    plt.tight_layout()
-    plt.savefig("plots/cp" + dataset + ".png")'''
+ 
     return coverages_mean, interval_widths_mean, coverages_std, interval_widths_std
 
 if __name__ == "__main__":

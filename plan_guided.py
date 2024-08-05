@@ -1,3 +1,8 @@
+"""
+Code adpated from: Planning with Diffusion for Flexible Behavior Synthesis (
+https://arxiv.org/abs/2205.09991)
+"""
+
 import pdb
 import diffuser.sampling as sampling
 import diffuser.utils as utils
